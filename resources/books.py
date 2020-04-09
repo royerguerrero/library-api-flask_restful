@@ -24,3 +24,10 @@ class Book(Resource):
     def get(self, book_id):
         abort_if_book_doesnt_exits(book_id)
         return jsonify({'data': BOOKS[book_id]})
+
+    def put(self, book_id):
+        abort_if_book_doesnt_exits(book_id)
+        args = parser.parse_args()
+        BOOKS[book_id] = ast.literal_eval(args['book_data'])
+        print(BOOKS)
+        return jsonify({'message':'successful midification'})
