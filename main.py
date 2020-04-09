@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 from flask_restful import Api
-from resources.books import BookList, Book
+from resources.books import Book, BookList
 
 app = Flask(__name__)
 api = Api(app)

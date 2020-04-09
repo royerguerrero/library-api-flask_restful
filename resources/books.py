@@ -1,6 +1,10 @@
-from flask import Blueprint, jsonify
-from flask_restful import Resource, abort
+from flask import jsonify, make_response
+from flask_restful import Resource, abort, reqparse
 from common.db import BOOKS
+import ast
+
+parser = reqparse.RequestParser()
+parser.add_argument('book_data')
 
 def abort_if_book_doesnt_exits(book_id):
     if book_id not in BOOKS:
@@ -10,7 +14,11 @@ class BookList(Resource):
     def get(self):
         return jsonify({'data': BOOKS})
     def post(self):
-        pass
+        args = parser.parse_args()
+        BOOKS[str(len(BOOKS) + 1)] = ast.literal_eval(args['book_data'])
+        print(BOOKS)
+        return make_response(jsonify({'message':'successful creation'}), 201)
+        
 
 class Book(Resource):
     def get(self, book_id):
