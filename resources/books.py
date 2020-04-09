@@ -30,4 +30,12 @@ class Book(Resource):
         args = parser.parse_args()
         BOOKS[book_id] = ast.literal_eval(args['book_data'])
         print(BOOKS)
-        return jsonify({'message':'successful midification'})
+        return jsonify({'message':'successful modification'})
+
+    def delete(self, book_id):
+        abort_if_book_doesnt_exits(book_id)
+        args = parser.parse_args()
+        del BOOKS[book_id]
+        print(BOOKS)
+        return jsonify({'message':'successful delete'})
+        
