@@ -1,27 +1,22 @@
-from flask import make_response, request
-import hmac, hashlib, time
+from flask import make_response, request, jsonify
+from functools import wraps
+from config import Config
+import jwt, datetime
 
-SECRET = 'TOP SECRET! SHHH'
+def token_requered(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('x-token')
 
-def generate_hash():
-    timestamp = str(int(time.time()))
+        if not token:
+            return make_response(jsonify({'message': 'Token is missing!'}), 403)
 
-    hash_api = hmac.new(key=SECRET.encode(), digestmod=hashlib.sha1)
-    hash_api.update('1'.encode()) #UID
-    hash_api.update(timestamp.encode()) # TIMESTAMP (Seg)
-    data = {'hash': hash_api.hexdigest(), 'timestamp': timestamp}
-    return data
+        try:
+            data = jwt.decode(token, Config.SECRET_KEY)
+        except:
+            return make_response(jsonify({'message': 'Token is invalid!'}), 403)
 
-def auth_required(func):
-    def wrapper(self):
-        hash_api = request.headers.get('X-HASH')
-        hash_client = hmac.new(key=SECRET.encode(), digestmod=hashlib.sha1)
-        hash_client.update(request.headers.get('X-UID').encode()) #UID
-        hash_client.update(request.headers.get('X-TIMESTAMP').encode()) # TIMESTAMP (Seg)
-        
-        if hash_api == hash_client.hexdigest():
-            return func(self)
+        return f(*args, **kwargs)
 
-        return make_response('Could not verify your login!', 401, {'WWW-Autencticate': 'Basic reaml="Login Required"'})
+    return decorated
 
-    return wrapper

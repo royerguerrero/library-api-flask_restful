@@ -1,7 +1,7 @@
 from flask import jsonify, make_response, request
 from flask_restful import Resource, abort, reqparse
 from common.db import BOOKS
-from common.auth import auth_required
+from common.auth import token_requered
 import ast
 
 parser = reqparse.RequestParser()
@@ -12,7 +12,7 @@ def abort_if_book_doesnt_exits(book_id):
         abort(404, message='El libro con id {} no existe'.format(book_id))
 
 class BookList(Resource):
-    @auth_required
+    @token_requered
     def get(self):
         return jsonify({'data': BOOKS})
     
